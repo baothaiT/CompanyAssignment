@@ -1,4 +1,5 @@
-﻿using CompanyCore;
+﻿using CompanyCore.Models;
+using CompanyCore.Entity;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -29,18 +30,18 @@ namespace ConpanyAPI.Controllers
             return Ok();
         }
 
-        //[HttpPut]
-        //public IActionResult Update()
-        //{
+        [HttpPut("{id}")]
+        public IActionResult Update(string id)
+        {
 
-        //    return Ok();
-        //}
+            return Ok();
+        }
 
-        //[HttpDelete]
-        //public IActionResult Delete()
-        //{
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
+        {
 
-        //    return Ok();
-        //}
+            return Ok();
+        }
     }
 }
