@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace CompanyCore.Models
+namespace CompanyCore.Dto
 {
-    public class Company
+    public class CompanyModels
     {
         public string companyId { get; set; }
         public string companyName { get; set; }

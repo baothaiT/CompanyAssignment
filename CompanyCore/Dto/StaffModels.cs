@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CompanyCore.Models
+namespace CompanyCore.Dto
 {
-    public class Staff
+    public class StaffModels
     {
         public string staffId { get; set; }
         public string staffName { get; set; }
