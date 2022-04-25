@@ -24,18 +24,26 @@ namespace ConpanyAPI.Controllers
         public async Task<IActionResult> GetAllAsync()
         {
 
-            var statementText = new StringBuilder();
-            statementText.Append("MATCH (n) RETURN n");
 
             var session = this._driver.AsyncSession();
-            var result = await session.ReadTransactionAsync(tx => tx.RunAsync(statementText.ToString()));
-
-            var companyList = result.Select(x => new Company()
+            try
             {
-                companyName = x.CompanyName,
-            });
-            return StatusCode(201, "Node has been created in the database");
+                return await session.ReadTransactionAsync(async tx =>
+                {
+                    var result = await tx.RunAsync("MATCH (p:Person) RETURN p.name");
+
+                    List<string> peopleList = await result.ToListAsync(r => r[0].As<string>());
+                    return Ok(peopleList);
+                });
+            }
+            finally
+            {
+                await session.CloseAsync();
+            }
+            
         }
+
+
 
         [HttpGet("{id}")]
         public IActionResult GetById(string id)
@@ -44,12 +52,7 @@ namespace ConpanyAPI.Controllers
             return Ok();
         }
 
-        [HttpPost]
-        public IActionResult Create(CompanyModels companyModels)
-        {
 
-            return Ok();
-        }
 
         [HttpPost("{name}")]
         public async Task<IActionResult> CreateNode(string name)
