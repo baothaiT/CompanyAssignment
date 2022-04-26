@@ -25,28 +25,34 @@ namespace ConpanyAPI.Controllers
         public async Task<IActionResult> GetAllAsync()
         {
 
-
+            var records = new List<Company>();
             var session = this._driver.AsyncSession();
             try
             {
                 return await session.ReadTransactionAsync(async tx =>
                 {
-                    var result = await tx.RunAsync("MATCH (p:Person) RETURN p.name as name ,p.id as id");
+                    var result = await tx.RunAsync("MATCH (p:Person) RETURN p.name as companyName ,Id(p) as companyId");
 
-                    var resultModel = result.Select(x => new Company
+                    var resultRecord = await result.ToListAsync();
+                    foreach (var item in resultRecord)
                     {
-                        companyName
-                    });
-                    
+                        records.Add(
+                            new Company
+                            {
+                                companyName = ValueExtensions.As<string>(item["companyName"]),
+                                companyId = ValueExtensions.As<string>(item["companyId"])
+                            });
+                    }
+
                     //List<string> peopleList = await result.ToListAsync(r => r[0].As<string>());
-                    return Ok();
+                    return Ok(records);
                 });
             }
             finally
             {
                 await session.CloseAsync();
             }
-            
+
         }
 
 
@@ -62,7 +68,7 @@ namespace ConpanyAPI.Controllers
                 {
                     Console.WriteLine("MATCH (p: Person) WHERE id(p)= {0} RETURN p.name", id);
 
-                    var result = await tx.RunAsync("MATCH (p: Person) WHERE id(p)= {0} RETURN p.name",id);
+                    var result = await tx.RunAsync("MATCH (p: Person) WHERE id(p)= {0} RETURN p.name", id);
 
                     List<string> peopleList = await result.ToListAsync(r => r[0].As<string>());
                     return Ok(peopleList);
