@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using System;
 
 namespace ConpanyAPI.Controllers
 {
@@ -30,10 +31,15 @@ namespace ConpanyAPI.Controllers
             {
                 return await session.ReadTransactionAsync(async tx =>
                 {
-                    var result = await tx.RunAsync("MATCH (p:Person) RETURN p.name");
+                    var result = await tx.RunAsync("MATCH (p:Person) RETURN p.name as name ,p.id as id");
 
-                    List<string> peopleList = await result.ToListAsync(r => r[0].As<string>());
-                    return Ok(peopleList);
+                    var resultModel = result.Select(x => new Company
+                    {
+                        companyName
+                    });
+                    
+                    //List<string> peopleList = await result.ToListAsync(r => r[0].As<string>());
+                    return Ok();
                 });
             }
             finally
@@ -46,10 +52,26 @@ namespace ConpanyAPI.Controllers
 
 
         [HttpGet("{id}")]
-        public IActionResult GetById(string id)
+        public async Task<IActionResult> GetById(string id)
         {
 
-            return Ok();
+            var session = this._driver.AsyncSession();
+            try
+            {
+                return await session.ReadTransactionAsync(async tx =>
+                {
+                    Console.WriteLine("MATCH (p: Person) WHERE id(p)= {0} RETURN p.name", id);
+
+                    var result = await tx.RunAsync("MATCH (p: Person) WHERE id(p)= {0} RETURN p.name",id);
+
+                    List<string> peopleList = await result.ToListAsync(r => r[0].As<string>());
+                    return Ok(peopleList);
+                });
+            }
+            finally
+            {
+                await session.CloseAsync();
+            }
         }
 
 
